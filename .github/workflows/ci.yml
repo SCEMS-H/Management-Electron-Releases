@@ -1,0 +1,25 @@
+name: Public repository guard
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Validate public file allowlist
+        shell: bash
+        run: |
+          git ls-files -z | python3 -c '
+          import sys
+          files = sys.stdin.buffer.read().decode().split("\0")
+          allowed = {"README.md", "AGENTS.md", "CONTRIBUTING.md", ".gitignore", ".gitattributes", ".editorconfig"}
+          unexpected = [f for f in files if f and f not in allowed and not f.startswith(".github/")]
+          if unexpected:
+              raise SystemExit("Unexpected public files: " + ", ".join(unexpected))
+          print("Public repository allowlist passed")
+          '
