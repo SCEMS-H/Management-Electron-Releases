@@ -11,13 +11,22 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.19.0'
+      - run: node --test tests/*.test.mjs
+      - name: Validate PR title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: node scripts/commit-message.mjs
       - name: Validate public file allowlist
         shell: bash
         run: |
           git ls-files -z | python3 -c '
           import sys
           files = sys.stdin.buffer.read().decode().split("\0")
-          allowed = {"README.md", "AGENTS.md", "CONTRIBUTING.md", ".gitignore", ".gitattributes", ".editorconfig"}
+          allowed = {"README.md", "AGENTS.md", "CONTRIBUTING.md", ".gitignore", ".gitattributes", ".editorconfig", ".githooks/commit-msg", "scripts/commit-message.mjs", "tests/commit-message.test.mjs"}
           unexpected = [f for f in files if f and f not in allowed and not f.startswith(".github/")]
           if unexpected:
               raise SystemExit("Unexpected public files: " + ", ".join(unexpected))

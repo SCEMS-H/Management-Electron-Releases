@@ -15,13 +15,14 @@
 ## 提交
 
 - 一个可验证逻辑单元对应一个本地提交；提交前检查 diff 并执行相关检查。
-- Conventional Commits：`<type>(<scope>): <subject>`，主题默认简体中文，常用 scope 为 `releases`。
+- Conventional Commits：`<type>[(<scope>)][!]: <subject>`，主题默认简体中文。scope 可选，使用仓内模块（如 `ipc`、`config`、`installer`、`release`、`contributing`），不使用 `desktop/server/student/shared/releases` 重复端名。无须细分时写 `docs: 更新说明`。历史提交不重写。
 - 提交描述最终交付结果，不记录反复试错；破坏性变化使用 `BREAKING CHANGE`。
 - 不提交令牌、`.env`、私钥、业务数据、依赖目录或生成物。
 
 ## 检查与审查
 
 - CI 检查公开仓文件白名单；本仓不执行业务端构建，不能将此检查视为安装包签名或发布验证。
+- 源码仓发布工作流只创建Release及白名单附件，不将二进制提交到本仓Git。跨仓令牌只保存在私有源码仓；本仓不得新增私有构建凭证。
 - 修改代码必须执行对应类型检查、测试和必要构建；UI 改动在条件允许时运行检查关键交互。
 - PR 说明变更、动机、验证、影响及关联事项。未执行的检查注明原因。
 - CHANGELOG 只描述相较上一发布版本的用户可见净变化，不作为开发日志。
